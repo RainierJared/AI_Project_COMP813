@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 668026531607328507}
-  - component: {fileID: 6923613262702241675}
   - component: {fileID: 4031950001057317801}
   - component: {fileID: 5967071498295223937}
   - component: {fileID: 5183432679019539686}
@@ -39,27 +38,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!95 &6923613262702241675
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7065920656399437712}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 03b7171572d6a0446a0bf58a2cf2bbfc, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &4031950001057317801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74,6 +52,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemy: {fileID: 5967071498295223937}
   Target: {fileID: 0}
+  animator: {fileID: 7859185256062204328}
+  isWalking: 0
 --- !u!195 &5967071498295223937
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -85,17 +65,17 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 1.5
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 2
 --- !u!33 &5183432679019539686
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -234,7 +214,7 @@ PrefabInstance:
     - target: {fileID: 9500000, guid: 317a56890b5c8e74ab1d492a2c7fb608, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 03b7171572d6a0446a0bf58a2cf2bbfc, type: 2}
+      objectReference: {fileID: 9100000, guid: afa8620d8ccc94149901243ea69f558c, type: 2}
     - target: {fileID: 9500000, guid: 317a56890b5c8e74ab1d492a2c7fb608, type: 3}
       propertyPath: m_WarningMessage
       value: 
@@ -252,5 +232,10 @@ PrefabInstance:
 --- !u!4 &7859185256052938290 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400122, guid: 317a56890b5c8e74ab1d492a2c7fb608, type: 3}
+  m_PrefabInstance: {fileID: 7859185256052804808}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &7859185256062204328 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 317a56890b5c8e74ab1d492a2c7fb608, type: 3}
   m_PrefabInstance: {fileID: 7859185256052804808}
   m_PrefabAsset: {fileID: 0}
