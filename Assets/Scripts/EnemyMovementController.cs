@@ -17,6 +17,9 @@ public class EnemyMovementController : MonoBehaviour
     //Patrolling
     public bool foundPlayer, attackPlayer;
 
+    //Alert
+    private bool hasPlayerPos;
+
     //Layer Meshes
     public LayerMask whatIsPlayer;
 
@@ -31,6 +34,7 @@ public class EnemyMovementController : MonoBehaviour
         isWalking = true;
         foundPlayer = false;
         onAPoint = false;
+        hasPlayerPos = false;
         Patrolling();
     }
 
@@ -58,12 +62,10 @@ public class EnemyMovementController : MonoBehaviour
         }
         if (foundPlayer && !attackPlayer)
         {
+            hasPlayerPos = true;
             Alert();
         }
-        if(foundPlayer && attackPlayer)
-        {
-            Engage();
-        }
+
 
         //For if the enemy hasn't found the player and the path isn't pending
         if (!enemy.pathPending && enemy.remainingDistance < 0.5f)
@@ -82,7 +84,7 @@ public class EnemyMovementController : MonoBehaviour
 
     void Alert()
     {
-
+        GetPlayerPos();
     }
 
     void Engage()
@@ -105,6 +107,35 @@ public class EnemyMovementController : MonoBehaviour
         }
     }
 
+    IEnumerator ScanForPlayer(float seconds)
+    {
+        float counter = 0;
+        while (counter < seconds)
+        {
+            enemy.transform.Rotate(new Vector3(90, 0, 0), Space.World);
+        }
+        GoToNextPoint();
+        yield return null;
+    }
+
+    private void GetPlayerPos()
+    {
+        if (hasPlayerPos)
+        {
+            Vector3 temp;
+            temp = playerTarget.position;
+            enemy.destination = temp;
+        }
+        if (foundPlayer && attackPlayer)
+        {
+            Engage();
+        } else
+        {
+            StartCoroutine(ScanForPlayer(5));
+        }
+        hasPlayerPos = false;
+    }
+    
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
