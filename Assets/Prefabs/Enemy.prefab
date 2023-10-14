@@ -60,6 +60,7 @@ MonoBehaviour:
   - {fileID: 0}
   animator: {fileID: 7859185256062204328}
   isWalking: 1
+  onAPoint: 0
   viewRange: 6
   attackRange: 2
   foundPlayer: 0

@@ -11,6 +11,7 @@ public class EnemyMovementController : MonoBehaviour
     public Animator animator;
     public bool isWalking, onAPoint;
     public float viewRange, attackRange;
+    private Vector3 lastKnownPos;
 
     //For 3 state AI
 
@@ -18,7 +19,7 @@ public class EnemyMovementController : MonoBehaviour
     public bool foundPlayer, attackPlayer;
 
     //Alert
-    private bool hasPlayerPos;
+    public bool hasPlayerPos;
 
     //Layer Meshes
     public LayerMask whatIsPlayer;
@@ -31,11 +32,16 @@ public class EnemyMovementController : MonoBehaviour
     {
         enemy = GetComponent<NavMeshAgent>();
         playerTarget = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>().transform;
+
+        //Console log tests and calling Patrolling state
+        Debug.Log("Hi mom");
+        Patrolling();
+
+        //Setting Boolean states
         isWalking = true;
         foundPlayer = false;
         onAPoint = false;
         hasPlayerPos = false;
-        Patrolling();
     }
 
     void Update()
@@ -62,16 +68,25 @@ public class EnemyMovementController : MonoBehaviour
         }
         if (foundPlayer && !attackPlayer)
         {
-            hasPlayerPos = true;
             Alert();
         }
-
-
-        //For if the enemy hasn't found the player and the path isn't pending
-        if (!enemy.pathPending && enemy.remainingDistance < 0.5f)
+        if (foundPlayer && attackPlayer)
         {
-            onAPoint = false;
-            GoToNextPoint();
+            Engage();
+        } 
+
+        if(!enemy.pathPending && enemy.remainingDistance < 0.5f)
+        {
+            bool temp = AnimatorIsPlaying("dance");
+            if (!hasPlayerPos && !foundPlayer && !attackPlayer && !temp)
+            {
+                onAPoint = false;
+                GoToNextPoint();
+            } else
+            {
+                StartCoroutine(Wait());
+            }
+
         }
     }
 
@@ -79,63 +94,62 @@ public class EnemyMovementController : MonoBehaviour
     //3 State Enemy AI
     void Patrolling()
     {
-        GoToNextPoint();
+        animator.SetTrigger("walk");
+        animator.ResetTrigger("dance");
+        animator.ResetTrigger("idle");
+        if (!onAPoint)
+        {
+            GoToNextPoint();
+            onAPoint = true;
+        }
     }   
 
     void Alert()
     {
+        animator.SetTrigger("walk");
+        animator.ResetTrigger("dance");
+        animator.ResetTrigger("idle");
         GetPlayerPos();
+        hasPlayerPos = true;
     }
 
     void Engage()
     {
-
+        enemy.ResetPath();
+        enemy.destination = transform.position;
+        animator.SetTrigger("dance");
+        animator.ResetTrigger("walk");
     }
 
     private void GoToNextPoint()
     {
-
-        if (onAPoint == false)
-        {
             if (pointsArr.Length == 0)
             {
                 return;
             }
-            onAPoint = true;
             enemy.destination = pointsArr[destPoint].position;
             destPoint = (destPoint + 1) % pointsArr.Length;        //Modulo to cycle back to the start if end of array is reached.
-        }
-    }
-
-    IEnumerator ScanForPlayer(float seconds)
-    {
-        float counter = 0;
-        while (counter < seconds)
-        {
-            enemy.transform.Rotate(new Vector3(90, 0, 0), Space.World);
-        }
-        GoToNextPoint();
-        yield return null;
     }
 
     private void GetPlayerPos()
     {
-        if (hasPlayerPos)
+        if(hasPlayerPos)
         {
-            Vector3 temp;
-            temp = playerTarget.position;
-            enemy.destination = temp;
+            lastKnownPos = playerTarget.position;
+            enemy.destination = lastKnownPos;
         }
-        if (foundPlayer && attackPlayer)
-        {
-            Engage();
-        } else
-        {
-            StartCoroutine(ScanForPlayer(5));
-        }
-        hasPlayerPos = false;
     }
     
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(5f);
+        hasPlayerPos = false;
+    }
+
+    private bool AnimatorIsPlaying(string stateName)
+    {
+        return animator.GetCurrentAnimatorStateInfo(0).length > animator.GetCurrentAnimatorStateInfo(0).normalizedTime && animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
