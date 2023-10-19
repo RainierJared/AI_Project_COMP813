@@ -30,6 +30,7 @@ public class EnemyMovementController : MonoBehaviour
 
     void Start()
     {
+        //Grabs components and GameObjects with sprcific tags
         enemy = GetComponent<NavMeshAgent>();
         playerTarget = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>().transform;
 
@@ -58,32 +59,37 @@ public class EnemyMovementController : MonoBehaviour
             animator.ResetTrigger("walk");
         }
 
+        //Credit toe Dave / GameDevelopment in Unity to proviing these two lines for Booleans.
         foundPlayer = Physics.CheckSphere(transform.position, viewRange, whatIsPlayer);      //Flag that checks if player is within range/collides with the GameObject's sphere
         attackPlayer = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);      //Flag that checks if player is within attack range
-
+        
         //Decision Tree
-        if(!foundPlayer && !attackPlayer)
-        {
-            Patrolling();
-        }
-        if (foundPlayer && !attackPlayer)
-        {
-            Alert();
-        }
-        if (foundPlayer && attackPlayer)
-        {
-            Engage();
-        } 
 
+        if(foundPlayer) {
+            if(attackPlayer) {
+                Engage();
+            } else {
+                Alert();
+            }
+        } else {
+            if(!attackPlayer) {
+                Patrolling();
+            }
+        }
+
+        //Checks if the enemy's distance between them and the goal is close
         if(!enemy.pathPending && enemy.remainingDistance < 0.5f)
         {
             bool temp = AnimatorIsPlaying("dance");
+            //Checks if Booleans are false
             if (!hasPlayerPos && !foundPlayer && !attackPlayer && !temp)
             {
+                //Calls this fucntion if they are
                 onAPoint = false;
                 GoToNextPoint();
             } else
             {
+                //Starts the coroutine, forcing the AI wait at the player's last known location
                 StartCoroutine(Wait());
             }
 
@@ -146,10 +152,15 @@ public class EnemyMovementController : MonoBehaviour
         hasPlayerPos = false;
     }
 
+    //Checks if Animator is playing an animation
+    //
     private bool AnimatorIsPlaying(string stateName)
     {
         return animator.GetCurrentAnimatorStateInfo(0).length > animator.GetCurrentAnimatorStateInfo(0).normalizedTime && animator.GetCurrentAnimatorStateInfo(0).IsName(stateName);
     }
+
+    //Displays the spheres if Gizmos are enabled
+    //To view, must be in play mode and click on "Enemies" on the left, and click on "gizmos" on the top bar, beneath the Game tab
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
